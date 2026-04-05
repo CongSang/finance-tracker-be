@@ -1,5 +1,6 @@
 package com.congsang.financetracker.mapper;
 
+import com.congsang.financetracker.common.enums.Status;
 import com.congsang.financetracker.dto.request.CategoryRequestDTO;
 import com.congsang.financetracker.dto.request.UserRequestDTO;
 import com.congsang.financetracker.dto.response.CategoryResponseDTO;
@@ -11,12 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryMapper {
 
-    public CategoryEntity toEntity(CategoryRequestDTO dto) {
+    public CategoryEntity toEntity(CategoryRequestDTO dto, UserEntity user) {
         if (dto == null) return null;
         return CategoryEntity.builder()
                 .name(dto.getName())
                 .type(dto.getType())
                 .iconUrl(dto.getIconUrl())
+                .status(Status.ACTIVE)
+                .user(user)
                 .build();
     }
 

@@ -88,27 +88,20 @@ public class WalletService {
             return walletMapper.toDTO(walletRepository.save(wallet));
         }
 
-        WalletEntity wallet = new WalletEntity();
-        wallet.setName(request.getName());
-        wallet.setBalance(request.getBalance() != null ? request.getBalance() : BigDecimal.ZERO);
-        wallet.setCurrency(request.getCurrency());
-        wallet.setColorCode(request.getColorCode());
-        wallet.setStatus(Status.ACTIVE);
-        wallet.setUser(currentUser);
-
+        WalletEntity wallet = walletMapper.toEntity(request, currentUser);
         return walletMapper.toDTO(walletRepository.save(wallet));
     }
 
     @Transactional
     public WalletResponseDTO updateWallet(Long id, WalletRequestDTO request, UserEntity currentUser) {
-        WalletEntity wallet = walletRepository.findById(id)
+        WalletEntity oldWallet = walletRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ví"));
 
-        if (!wallet.getUser().getId().equals(currentUser.getId())) {
+        if (!oldWallet.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Bạn không có quyền sửa ví này");
         }
 
-        if (!wallet.getName().equals(request.getName())) {
+        if (!oldWallet.getName().equals(request.getName())) {
             boolean exists = walletRepository.existsByNameAndUserAndIdNot(
                     request.getName(), currentUser, id);
             if (exists) {
@@ -117,11 +110,8 @@ public class WalletService {
             }
         }
 
-        wallet.setName(request.getName());
-        wallet.setColorCode(request.getColorCode());
-        wallet.setBalance(request.getBalance());
-        wallet.setCurrency(request.getCurrency());
-
+        WalletEntity wallet = walletMapper.toEntity(request, currentUser);
+        wallet.setId(id);
         return walletMapper.toDTO(walletRepository.save(wallet));
     }
 

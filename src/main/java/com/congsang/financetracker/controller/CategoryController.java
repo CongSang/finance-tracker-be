@@ -33,9 +33,18 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategories(currentUser.getUser()));
     }
 
-    @PostMapping
-    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO request, @AuthenticationPrincipal UserPrincipal currentUser) {
+    @PostMapping("/create")
+    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO request,
+                                                      @AuthenticationPrincipal UserPrincipal currentUser) {
         return ResponseEntity.ok(categoryService.createCategory(request, currentUser.getUser()));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> update(
+            @PathVariable Long id,
+            @RequestBody CategoryRequestDTO request,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, request, currentUser.getUser()));
     }
 
     @DeleteMapping("/{id}")

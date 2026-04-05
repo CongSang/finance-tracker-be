@@ -40,15 +40,36 @@ public class CategoryService {
             if (category.getStatus() == Status.ACTIVE) {
                 throw new BadRequestException("Danh mục này đã tồn tại!");
             }
-
-            category.setStatus(Status.ACTIVE);
-
-            return categoryMapper.toDTO(categoryRepository.save(category));
         }
 
-        CategoryEntity category = categoryMapper.toEntity(request);
-        category.setUser(currentUser);
+        CategoryEntity category = categoryMapper.toEntity(request, currentUser);
+        return categoryMapper.toDTO(categoryRepository.save(category));
+    }
 
+    @Transactional
+    public CategoryResponseDTO updateCategory(Long id, CategoryRequestDTO request, UserEntity currentUser) {
+        CategoryEntity oldCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục"));
+
+        if (oldCategory.getUser() == null) {
+            throw new AccessDeniedException("Bạn không có quyền sửa danh mục hệ thống");
+        }
+
+        if (!oldCategory.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Bạn không có quyền sửa danh mục này");
+        }
+
+        if (!oldCategory.getName().equals(request.getName())) {
+            boolean exists = categoryRepository.existsByNameAndUserAndIdNot(
+                    request.getName(), currentUser, id);
+            if (exists) {
+                throw new BadRequestException(
+                        "Tên danh mục '" + request.getName() + "' đã được sử dụng!");
+            }
+        }
+
+        CategoryEntity category = categoryMapper.toEntity(request, currentUser);
+        category.setId(id);
         return categoryMapper.toDTO(categoryRepository.save(category));
     }
 

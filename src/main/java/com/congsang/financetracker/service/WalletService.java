@@ -127,4 +127,9 @@ public class WalletService {
         wallet.setStatus(Status.INACTIVE);
         walletRepository.save(wallet);
     }
+
+    public List<WalletResponseDTO> getWalletDropdown(UserEntity currentUser) {
+        return walletRepository.findAllVisibleToUser(currentUser)
+                .stream().map(walletMapper::toDTO).toList();
+    }
 }

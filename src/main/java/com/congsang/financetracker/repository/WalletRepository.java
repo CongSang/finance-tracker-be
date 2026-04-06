@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -27,6 +28,9 @@ public interface WalletRepository extends JpaRepository<WalletEntity, Long> {
     // Tính tổng tiền đang "Sẵn sàng chi tiêu" (Chỉ ví Active)
     @Query("SELECT SUM(w.balance) FROM WalletEntity w WHERE w.user = :user AND w.status = 'ACTIVE'")
     BigDecimal sumTotalActiveBalanceByUser(UserEntity user);
+
+    @Query("SELECT w FROM WalletEntity w WHERE w.user = :user AND w.status = 'ACTIVE'")
+    List<WalletEntity> findAllVisibleToUser(UserEntity user);
 
     // Tính tổng tài sản thực tế (Tất cả ví)
     @Query("SELECT SUM(w.balance) FROM WalletEntity w WHERE w.user = :user")

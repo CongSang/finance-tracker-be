@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/wallets")
 @RequiredArgsConstructor
@@ -58,5 +60,12 @@ public class WalletController {
     ) {
         walletService.archiveWallet(id, currentUser.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/dropdown")
+    public ResponseEntity<List<WalletResponseDTO>> getWalletDropdown(
+            @AuthenticationPrincipal UserPrincipal currentUser
+    ) {
+        return ResponseEntity.ok(walletService.getWalletDropdown(currentUser.getUser()));
     }
 }

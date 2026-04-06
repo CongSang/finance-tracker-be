@@ -21,7 +21,8 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @NullMarked
     Optional<CategoryEntity> findById(Long id);
 
-    Optional<CategoryEntity> findByNameAndUserIsNull(String name);
+    @Query("SELECT c FROM CategoryEntity c WHERE c.user IS NULL AND c.type = :type")
+    Optional<CategoryEntity> findByTypeAndUserIsNull(TransactionType type);
 
     boolean existsByNameAndUserAndIdNot(String name, UserEntity user, Long id);
 }

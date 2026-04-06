@@ -1,5 +1,6 @@
 package com.congsang.financetracker.service;
 
+import com.congsang.financetracker.common.enums.TransactionType;
 import com.congsang.financetracker.dto.request.TransferRequestDTO;
 import com.congsang.financetracker.entity.*;
 import com.congsang.financetracker.exception.BadRequestException;
@@ -48,7 +49,7 @@ public class TransferService {
             throw new BadRequestException("Số dư ví gửi không đủ để chuyển khoản");
         }
 
-        CategoryEntity transferCategory = categoryRepository.findByNameAndUserIsNull("Chuyển khoản")
+        CategoryEntity transferCategory = categoryRepository.findByTypeAndUserIsNull(TransactionType.TRANSFER)
                 .orElseThrow(() -> new ResourceNotFoundException("Hệ thống thiếu danh mục Chuyển khoản"));
 
         fromWallet.setBalance(fromWallet.getBalance().subtract(request.getAmount()));

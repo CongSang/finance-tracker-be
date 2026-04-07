@@ -251,7 +251,7 @@ public class TransactionService {
         WalletEntity wallet = transaction.getWallet();
         BigDecimal amount = transaction.getAmount();
 
-        if (transaction.getNote().contains("Chuyển khoản từ ví")) {
+        if (transaction.getNote().contains("Chuyển khoản đến ví")) {
             wallet.setBalance(wallet.getBalance().add(amount));
         } else if (transaction.getNote().contains("Nhận tiền từ ví")) {
             wallet.setBalance(wallet.getBalance().subtract(amount));

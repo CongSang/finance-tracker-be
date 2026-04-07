@@ -16,5 +16,6 @@ public class TransactionResponseDTO {
     private LocalDateTime transactionDate;
     private WalletResponseDTO wallet;
     private CategoryResponseDTO category;
+    private Long transferId;
     private BudgetAnalysisDTO warning;
 }

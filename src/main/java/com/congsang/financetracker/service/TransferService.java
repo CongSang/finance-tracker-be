@@ -66,7 +66,7 @@ public class TransferService {
         // Bản ghi CHI (Từ ví gửi)
         TransactionEntity outTx = createTransferRecord(
                 request, fromWallet, transferCategory, currentUser,
-                "Chuyển khoản từ ví " + toWallet.getName(), transfer);
+                "Chuyển khoản đến ví " + toWallet.getName(), transfer);
         // Bản ghi THU (Tại ví nhận)
         TransactionEntity inTx = createTransferRecord(
                 request, toWallet, transferCategory, currentUser,

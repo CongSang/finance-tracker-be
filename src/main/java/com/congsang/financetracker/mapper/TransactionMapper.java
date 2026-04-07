@@ -28,9 +28,11 @@ public class TransactionMapper {
     public TransactionResponseDTO toDTO(TransactionEntity entity) {
         if (entity == null) return null;
         return TransactionResponseDTO.builder()
+                .id(entity.getId())
                 .note(entity.getNote())
                 .amount(entity.getAmount())
                 .transactionDate(entity.getTransactionDate())
+                .transferId(entity.getTransfer() != null ? entity.getTransfer().getId() : null)
                 .category(categoryMapper.toDTO(entity.getCategory()))
                 .wallet(walletMapper.toDTO((entity.getWallet())))
                 .build();

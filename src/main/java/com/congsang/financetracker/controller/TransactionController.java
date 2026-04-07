@@ -23,7 +23,7 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<PagedResponseDTO<TransactionResponseDTO>> getTransactions(
             @RequestBody PagedRequestDTO pageRequest,
             @RequestParam(required = false) Long walletId,
@@ -45,7 +45,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactionById(id, currentUser.getUser()));
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TransactionResponseDTO> createTransaction(
             @RequestBody TransactionRequestDTO request,
             @AuthenticationPrincipal UserPrincipal currentUser

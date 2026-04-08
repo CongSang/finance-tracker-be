@@ -4,12 +4,14 @@ import com.congsang.financetracker.dto.response.BudgetResponseDTO;
 import com.congsang.financetracker.dto.response.WalletResponseDTO;
 import com.congsang.financetracker.entity.BudgetEntity;
 import com.congsang.financetracker.entity.WalletEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BudgetMapper {
 
-    private CategoryMapper categoryMapper;
+    private final CategoryMapper categoryMapper;
 
     public BudgetResponseDTO toDTO(BudgetEntity entity) {
         if (entity == null) return null;

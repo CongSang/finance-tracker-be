@@ -59,13 +59,13 @@ public class GlobalExceptionHandler {
         );
     }
 
-    // Lỗi hệ thống chung (Catch-all)
+    // Lỗi hệ thống chung (Catch-all) "Đã có lỗi xảy ra, vui lòng liên hệ admin hoặc thử lại sau."
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex) {
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Lỗi hệ thống",
-                "Đã có lỗi xảy ra, vui lòng liên hệ admin hoặc thử lại sau."
+                ex.getMessage()
         );
     }
 

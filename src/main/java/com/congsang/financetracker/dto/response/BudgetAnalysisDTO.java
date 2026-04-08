@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class BudgetAnalysisDTO {
     // Dữ liệu định danh
     private Long budgetId;
-    private CategoryResponseDTO category;
+    private BudgetResponseDTO budget;
 
     // Các con số thực tế
     private BigDecimal limitAmount;     // Hạn mức đặt ra (ví dụ: 10.000.000)

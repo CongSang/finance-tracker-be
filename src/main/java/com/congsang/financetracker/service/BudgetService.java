@@ -9,7 +9,6 @@ import com.congsang.financetracker.dto.response.BudgetHistoryDTO;
 import com.congsang.financetracker.dto.response.BudgetResponseDTO;
 import com.congsang.financetracker.entity.BudgetEntity;
 import com.congsang.financetracker.entity.CategoryEntity;
-import com.congsang.financetracker.entity.TransactionEntity;
 import com.congsang.financetracker.entity.UserEntity;
 import com.congsang.financetracker.exception.BadRequestException;
 import com.congsang.financetracker.exception.ResourceNotFoundException;
@@ -39,7 +38,6 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
     private final BudgetMapper budgetMapper;
 
     public List<BudgetAnalysisDTO> getBudgetProgress(int month, int year, UserEntity user) {
@@ -71,14 +69,14 @@ public class BudgetService {
         BigDecimal limit = budget.getAmountLimit();
         BigDecimal remaining = limit.subtract(actualSpent);
 
-        // 1. Tính % đã tiêu
+        // Tính % đã tiêu
         double percentUsed = 0;
         if (limit.compareTo(BigDecimal.ZERO) > 0) {
             percentUsed = actualSpent.multiply(new BigDecimal(100))
                     .divide(limit, 2, RoundingMode.HALF_UP).doubleValue();
         }
 
-        // 2. Tính Velocity (Tốc độ tiêu tiền)
+        // Tính Velocity (Tốc độ tiêu tiền)
         double timeRatio = (double) currentDay / daysInMonth;
         double spendingRatio = (limit.compareTo(BigDecimal.ZERO) > 0)
                 ? actualSpent.divide(limit, 4, RoundingMode.HALF_UP).doubleValue()
@@ -103,7 +101,6 @@ public class BudgetService {
             }
         }
 
-        // 4. Xác định Status & Lời khuyên
         Warning status = Warning.GOOD;
         String advice = "Bạn đang kiểm soát tốt chi tiêu.";
 
@@ -118,10 +115,9 @@ public class BudgetService {
             advice = "Sắp chạm mốc giới hạn ngân sách tháng này.";
         }
 
-        // 5. Trả về DTO chuẩn
         return new BudgetAnalysisDTO(
                 budget.getId(),
-                categoryMapper.toDTO(budget.getCategory()),
+                budgetMapper.toDTO(budget),
                 limit,
                 actualSpent,
                 remaining,
@@ -156,6 +152,8 @@ public class BudgetService {
             if (!category.getType().equals(TransactionType.EXPENSE)) {
                 throw new BadRequestException("Hạn mức chỉ có thể áp dụng cho danh mục chi tiêu!");
             }
+
+            System.out.println("run");
 
             budget.setCategory(category);
             budget.setAmountLimit(request.getAmountLimit());

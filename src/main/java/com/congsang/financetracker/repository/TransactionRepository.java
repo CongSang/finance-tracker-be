@@ -66,21 +66,23 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "AND FUNCTION('MONTH', t.transactionDate) = :month " +
             "AND FUNCTION('YEAR', t.transactionDate) = :year")
     BigDecimal sumAmountByTypeAndMonth(@Param("user") UserEntity user,
-                                       @Param("type") String type,
+                                       @Param("type") TransactionType type,
                                        @Param("month") int month,
                                        @Param("year") int year);
 
     @Query("SELECT new com.congsang.financetracker.dto.response.SpendingCategoryDTO(" +
             "t.category.name, t.category.iconUrl, SUM(t.amount), 0.0) " +
             "FROM TransactionEntity t " +
-            "WHERE t.user = :user AND t.category.type = 'EXPENSE' " +
-            "AND FUNCTION('MONTH', t.transactionDate) = :month " +
-            "AND FUNCTION('YEAR', t.transactionDate) = :year " +
+            "WHERE t.user = :user " +
+            "AND t.category.type = 'EXPENSE' " +
+            "AND EXTRACT(MONTH FROM t.transactionDate) = :month " +
+            "AND EXTRACT(YEAR FROM t.transactionDate) = :year " +
             "GROUP BY t.category.id, t.category.name, t.category.iconUrl " +
             "ORDER BY SUM(t.amount) DESC")
     List<SpendingCategoryDTO> getSpendingByCategory(@Param("user") UserEntity user,
                                                     @Param("month") int month,
-                                                    @Param("year") int year);
+                                                    @Param("year") int year,
+                                                    Pageable pageable);
 
     @Query("SELECT new com.congsang.financetracker.dto.response.CashFlowTrendDTO(" +
             "FUNCTION('DATE_FORMAT', t.transactionDate, '%d/%m'), " +
@@ -88,8 +90,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "SUM(CASE WHEN t.category.type = 'EXPENSE' THEN t.amount ELSE 0 END)) " +
             "FROM TransactionEntity t " +
             "WHERE t.user = :user " +
-            "AND FUNCTION('MONTH', t.transactionDate) = :month " +
-            "AND FUNCTION('YEAR', t.transactionDate) = :year " +
+            "AND EXTRACT(MONTH FROM t.transactionDate) = :month " +
+            "AND EXTRACT(YEAR FROM t.transactionDate) = :year " +
             "GROUP BY FUNCTION('DATE_FORMAT', t.transactionDate, '%d/%m'), t.transactionDate " +
             "ORDER BY t.transactionDate ASC")
     List<CashFlowTrendDTO> getDailyCashFlow(

@@ -1,15 +1,16 @@
 package com.congsang.financetracker.service;
 
+import com.congsang.financetracker.common.enums.TransactionType;
 import com.congsang.financetracker.common.enums.Warning;
-import com.congsang.financetracker.dto.request.PagedRequestDTO;
 import com.congsang.financetracker.dto.response.CashFlowTrendDTO;
 import com.congsang.financetracker.dto.response.DashboardSummaryDTO;
 import com.congsang.financetracker.dto.response.SpendingCategoryDTO;
-import com.congsang.financetracker.dto.response.WalletResponseDTO;
 import com.congsang.financetracker.entity.UserEntity;
 import com.congsang.financetracker.repository.TransactionRepository;
 import com.congsang.financetracker.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,8 +39,8 @@ public class DashboardService {
         totalBalance = (totalBalance != null) ? totalBalance : BigDecimal.ZERO;
 
         // Thu/Chi tháng này
-        BigDecimal incomeMonth = getSum(user, "INCOME", curMonth, curYear);
-        BigDecimal expenseMonth = getSum(user, "EXPENSE", curMonth, curYear);
+        BigDecimal incomeMonth = getSum(user, TransactionType.INCOME, curMonth, curYear);
+        BigDecimal expenseMonth = getSum(user, TransactionType.EXPENSE, curMonth, curYear);
 
         // Tính % thay đổi số dư so với tháng trước
         double changePercent = calculateChangePercent(user, incomeMonth, expenseMonth);
@@ -58,15 +59,15 @@ public class DashboardService {
                 .build();
     }
 
-    private BigDecimal getSum(UserEntity user, String type, int m, int y) {
+    private BigDecimal getSum(UserEntity user, TransactionType type, int m, int y) {
         BigDecimal sum = transactionRepository.sumAmountByTypeAndMonth(user, type, m, y);
         return (sum != null) ? sum : BigDecimal.ZERO;
     }
 
     private double calculateChangePercent(UserEntity user, BigDecimal curIncome, BigDecimal curExpense) {
         LocalDate lastMonth = LocalDate.now().minusMonths(1);
-        BigDecimal lastIncome = getSum(user, "INCOME", lastMonth.getMonthValue(), lastMonth.getYear());
-        BigDecimal lastExpense = getSum(user, "EXPENSE", lastMonth.getMonthValue(), lastMonth.getYear());
+        BigDecimal lastIncome = getSum(user, TransactionType.INCOME, lastMonth.getMonthValue(), lastMonth.getYear());
+        BigDecimal lastExpense = getSum(user, TransactionType.EXPENSE, lastMonth.getMonthValue(), lastMonth.getYear());
 
         BigDecimal currentNet = curIncome.subtract(curExpense); // Số tiền dư ra tháng này
         BigDecimal lastNet = lastIncome.subtract(lastExpense);   // Số tiền dư ra tháng trước
@@ -81,7 +82,8 @@ public class DashboardService {
 
     public List<SpendingCategoryDTO> getSpendingStructure(UserEntity user, int month, int year) {
         // 1. Lấy danh sách chi tiêu đã nhóm theo Category từ DB
-        List<SpendingCategoryDTO> list = transactionRepository.getSpendingByCategory(user, month, year);
+        Pageable top3 = PageRequest.of(0, 3);
+        List<SpendingCategoryDTO> list = transactionRepository.getSpendingByCategory(user, month, year, top3);
 
         // 2. Tính tổng tất cả chi tiêu trong tháng để làm mẫu số
         BigDecimal totalMonthExpense = list.stream()
@@ -104,6 +106,8 @@ public class DashboardService {
 
     public List<CashFlowTrendDTO> getCashFlowTrend(UserEntity user, int month, int year) {
         List<CashFlowTrendDTO> actualData = transactionRepository.getDailyCashFlow(user, month, year);
+
+        System.out.println(actualData);
 
         Map<String, CashFlowTrendDTO> dataMap = actualData.stream()
                 .collect(Collectors.toMap(CashFlowTrendDTO::getDate, d -> d));

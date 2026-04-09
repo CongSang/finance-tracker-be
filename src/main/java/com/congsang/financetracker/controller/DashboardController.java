@@ -4,15 +4,13 @@ import com.congsang.financetracker.dto.request.FilterRequestDTO;
 import com.congsang.financetracker.dto.request.PagedRequestDTO;
 import com.congsang.financetracker.dto.response.*;
 import com.congsang.financetracker.entity.UserEntity;
+import com.congsang.financetracker.security.UserPrincipal;
 import com.congsang.financetracker.service.DashboardService;
 import com.congsang.financetracker.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,24 +22,24 @@ public class DashboardController {
     private final WalletService walletService;
 
     @GetMapping("/summary")
-    public ResponseEntity<DashboardSummaryDTO> getSummary(@AuthenticationPrincipal UserEntity user) {
-        return ResponseEntity.ok(dashboardService.getOverview(user));
+    public ResponseEntity<DashboardSummaryDTO> getSummary(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.ok(dashboardService.getOverview(user.getUser()));
     }
 
-    @GetMapping("/spending-structure")
+    @PostMapping("/spending-structure")
     public ResponseEntity<List<SpendingCategoryDTO>> getSpendingStructure(
             @RequestBody FilterRequestDTO request,
-            @AuthenticationPrincipal UserEntity user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(dashboardService.getSpendingStructure(
-                user, request.getMonth(), request.getYear()));
+                user.getUser(), request.getMonth(), request.getYear()));
     }
 
-    @GetMapping("/cash-flow-trend")
+    @PostMapping("/cash-flow-trend")
     public ResponseEntity<List<CashFlowTrendDTO>> getCashFlowTrend(
             @RequestBody FilterRequestDTO request,
-            @AuthenticationPrincipal UserEntity user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(dashboardService.getCashFlowTrend(
-                user, request.getMonth(), request.getYear()));
+                user.getUser(), request.getMonth(), request.getYear()));
     }
 
     @GetMapping("/wallets-mini")

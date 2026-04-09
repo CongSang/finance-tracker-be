@@ -93,7 +93,12 @@ public class BudgetService {
             BigDecimal avgSpendPerDay = actualSpent.divide(BigDecimal.valueOf(currentDay), 2, RoundingMode.HALF_UP);
 
             // Ngày dự kiến hết tiền = Tổng ngân sách / Chi tiêu trung bình mỗi ngày
-            projectedDay = limit.divide(avgSpendPerDay, 0, RoundingMode.FLOOR).intValue();
+            if (avgSpendPerDay.compareTo(BigDecimal.ZERO) > 0) {
+                projectedDay = limit.divide(avgSpendPerDay, 0, RoundingMode.FLOOR).intValue();
+            } else {
+                // Nếu chưa tiêu gì, dự kiến sẽ hết tiền vào ngày cuối cùng của tháng hoặc để mặc định
+                projectedDay = daysInMonth;
+            }
 
             // Hạn mức chi tiêu mỗi ngày còn lại để không vỡ kế hoạch
             if (remainingDays > 0 && remaining.compareTo(BigDecimal.ZERO) > 0) {

@@ -4,15 +4,18 @@ import com.congsang.financetracker.dto.request.PagedRequestDTO;
 import com.congsang.financetracker.dto.request.TransactionRequestDTO;
 import com.congsang.financetracker.dto.request.WalletRequestDTO;
 import com.congsang.financetracker.dto.response.PagedResponseDTO;
+import com.congsang.financetracker.dto.response.ScanResponseDTO;
 import com.congsang.financetracker.dto.response.TransactionResponseDTO;
 import com.congsang.financetracker.dto.response.WalletResponseDTO;
 import com.congsang.financetracker.security.UserPrincipal;
+import com.congsang.financetracker.service.OcrService;
 import com.congsang.financetracker.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final OcrService ocrService;
 
     @PostMapping
     public ResponseEntity<PagedResponseDTO<TransactionResponseDTO>> getTransactions(
@@ -69,5 +73,14 @@ public class TransactionController {
     ) {
         transactionService.deleteTransaction(id, currentUser.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/scan")
+    public ResponseEntity<?> scan(@RequestBody MultipartFile file) {
+        try {
+            return ResponseEntity.ok(ocrService.scanInvoice(file));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 }
